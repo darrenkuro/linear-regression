@@ -2,26 +2,6 @@ import json
 import csv
 import sys
 
-def load_model(path="model.json"):
-    try:
-        with open(path) as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: file '{path}' for model not found.", file=sys.stderr)
-        sys.exit(1)
-    except PermissionError:
-        print(f"Error: permission denied for '{path}'.", file=sys.stderr)
-        sys.exit(1)
-    except json.JSONDecodeError:
-        print("Error: model data corruption.", file=sys.stderr)
-        sys.exit(1)
-
-    if not data["trained"]:
-        print("Model is untrained. Please run train.py first.", file=sys.stderr)
-        sys.exit(1)
-
-    return data["theta0"], data["theta1"]
-
 def load_data(path="data.csv"):
     x, y = [], []
     try:
@@ -49,3 +29,34 @@ def load_data(path="data.csv"):
         sys.exit(1)
 
     return x, y
+
+
+def save_model(theta0, theta1, path="model.json"):
+    data = {"theta0": theta0, "theta1": theta1, "trained": True}
+    try:
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)
+    except PermissionError:
+        print(f"Error: permission denied when writing '{path}'.", file=sys.stderr)
+        sys.exit(1)
+
+def load_model(path="model.json"):
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: file '{path}' for model not found.", file=sys.stderr)
+        sys.exit(1)
+    except PermissionError:
+        print(f"Error: permission denied for '{path}'.", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print("Error: model data corruption.", file=sys.stderr)
+        sys.exit(1)
+
+    if not data["trained"]:
+        print("Model is untrained. Please run train.py first.", file=sys.stderr)
+        sys.exit(1)
+
+    return data["theta0"], data["theta1"]
+
