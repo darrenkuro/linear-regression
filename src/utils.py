@@ -1,8 +1,12 @@
 import json
 import csv
-import sys
 
-def load_data(path="data.csv"):
+class DataLoadError(Exception): pass
+class ModelLoadError(Exception): pass
+class ModelSaveError(Exception): pass
+
+def load_data(path: str = "data.csv") -> tuple[list[float], list[float]]:
+    """Load 'km' and 'price' data from a CSV file. Raises DataLoadError if failed."""
     x, y = [], []
     try:
         with open(path, newline="") as f:
@@ -11,52 +15,40 @@ def load_data(path="data.csv"):
                 try:
                     x.append(float(row["km"]))
                     y.append(float(row["price"]))
-                except (ValueError, KeyError):
-                    print(f"Error: malformed row in '{path}': {row}", file=sys.stderr)
-                    sys.exit(1)
-    except FileNotFoundError:
-        print(f"Error: file '{path}' not found.", file=sys.stderr)
-        sys.exit(1)
-    except PermissionError:
-        print(f"Error: permission denied for '{path}'.", file=sys.stderr)
-        sys.exit(1)
-    except csv.Error as e:
-        print(f"Error: invalid CSV format in '{path}': {e}", file=sys.stderr)
-        sys.exit(1)
+                except (ValueError, KeyError) as e:
+                    raise DataLoadError(f"Malformed row in '{path}': {row}") from e
+    except (OSError, UnicodeDecodeError, csv.Error) as e:
+        raise DataLoadError(f"Failed to read '{path}': {e}") from e
 
     if not x or not y:
-        print(f"Error: file '{path}' is empty or missing data.", file=sys.stderr)
-        sys.exit(1)
+        raise DataLoadError(f"File '{path}' contains no valid rows.")
 
     return x, y
 
-
-def save_model(theta0, theta1, path="model.json"):
+def save_model(theta0: float, theta1: float, path: str = "model.json") -> None:
+    """Save model parameters to a JSON file. Raises ModelSaveError if failed."""
     data = {"theta0": theta0, "theta1": theta1, "trained": True}
     try:
         with open(path, "w") as f:
             json.dump(data, f, indent=4)
-    except PermissionError:
-        print(f"Error: permission denied when writing '{path}'.", file=sys.stderr)
-        sys.exit(1)
+    except OSError as e:
+        raise ModelSaveError(f"Failed to write model to '{path}': {e}") from e
 
-def load_model(path="model.json"):
+def load_model(path: str = "model.json") -> tuple[float, float]:
+    """Load model parameters from a JSON file. Raises ModelLoadError if failed."""
     try:
         with open(path) as f:
             data = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: file '{path}' for model not found.", file=sys.stderr)
-        sys.exit(1)
-    except PermissionError:
-        print(f"Error: permission denied for '{path}'.", file=sys.stderr)
-        sys.exit(1)
-    except json.JSONDecodeError:
-        print("Error: model data corruption.", file=sys.stderr)
-        sys.exit(1)
+    except (OSError, json.JSONDecodeError) as e:
+        raise ModelLoadError(f"Failed to load model from '{path}': {e}") from e
 
-    if not data["trained"]:
-        print("Model is untrained. Please run train.py first.", file=sys.stderr)
-        sys.exit(1)
+    if not data.get("trained", False):
+        raise ModelLoadError(f"Model file '{path}' is untrained. Run train.py first.")
 
-    return data["theta0"], data["theta1"]
+    try:
+        theta0 = float(data["theta0"])
+        theta1 = float(data["theta1"])
+    except (KeyError, ValueError, TypeError) as e:
+        raise ModelLoadError(f"Model file '{path}' is malformed or missing parameters.") from e
 
+    return theta0, theta1
