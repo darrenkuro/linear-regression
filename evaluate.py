@@ -23,7 +23,7 @@ def plot_results(x: list[float], y: list[float], theta0: float, theta1: float) -
     plt.legend()
     plt.grid(True, linestyle="--", alpha=0.5)
     plt.tight_layout()
-    plt.show()
+    plt.savefig("plot.png")
 
 
 def evaluate(x: list[float], y: list[float], theta0: float, theta1: float) -> tuple[float, float]:
@@ -70,7 +70,7 @@ def main() -> None:
     print(f"Mean Absolute Error: {mae:.2f}")
     print(f"Precision: {precision:.2f}%")
 
-    plot_result(x, y, theta0, theta1)
+    plot_results(x, y, theta0, theta1)
     sys.exit(0)
 
 

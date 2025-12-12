@@ -18,7 +18,8 @@ def load_data(path: str = "data.csv") -> tuple[list[float], list[float]]:
                 except (ValueError, KeyError) as e:
                     raise DataLoadError(f"Malformed row in '{path}': {row}") from e
     except (OSError, UnicodeDecodeError, csv.Error) as e:
-        raise DataLoadError(f"Failed to read '{path}': {e}") from e
+        msg = getattr(e, "strerror", str(e))
+        raise DataLoadError(f"Failed to read '{path}': {msg}") from e
 
     if not x or not y:
         raise DataLoadError(f"File '{path}' contains no valid rows.")
@@ -32,7 +33,7 @@ def save_model(theta0: float, theta1: float, path: str = "model.json") -> None:
         with open(path, "w") as f:
             json.dump(data, f, indent=4)
     except OSError as e:
-        raise ModelSaveError(f"Failed to write model to '{path}': {e}") from e
+        raise ModelSaveError(f"Failed to write model to '{path}': {e.strerror}") from e
 
 def load_model(path: str = "model.json") -> tuple[float, float]:
     """Load model parameters from a JSON file. Raises ModelLoadError if failed."""
@@ -40,7 +41,8 @@ def load_model(path: str = "model.json") -> tuple[float, float]:
         with open(path) as f:
             data = json.load(f)
     except (OSError, json.JSONDecodeError) as e:
-        raise ModelLoadError(f"Failed to load model from '{path}': {e}") from e
+        msg = getattr(e, "strerror", str(e))
+        raise ModelLoadError(f"Failed to load model from '{path}': {msg}") from e
 
     if not data.get("trained", False):
         raise ModelLoadError(f"Model file '{path}' is untrained. Run train.py first.")

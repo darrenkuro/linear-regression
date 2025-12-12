@@ -19,7 +19,7 @@ def train(
     y: list[float],
     learning_rate: float = 0.1,
     iterations: int = 10_000,
-) -> tuple[float, float]:
+) -> tuple[float, float, list[tuple[float, float]]]:
     """Train a simple linear regression model using gradient descent."""
     if not x or not y:
         raise ValueError("Training data cannot be empty.")
@@ -28,6 +28,7 @@ def train(
 
     m = len(x)
     theta0, theta1 = 0.0, 0.0
+    snapshots = []
 
     for _ in range(iterations):
         preds = [theta0 + theta1 * xi for xi in x]
@@ -39,7 +40,39 @@ def train(
         theta0 -= learning_rate * grad0
         theta1 -= learning_rate * grad1
 
-    return theta0, theta1
+        if _ %20 == 0:
+            snapshots.append((theta0, theta1))
+
+    return theta0, theta1, snapshots
+
+def visualize(x_norm, y_norm, snapshots) -> None:
+    """Animate regression line evolution."""
+    try:
+        import matplotlib.pyplot as plt
+        from matplotlib.animation import FuncAnimation, PillowWriter
+    except ImportError:
+        print("Warning: matplotlib not installed. Skipping plot.", file=sys.stderr)
+        return
+
+    fig, ax = plt.subplots()
+    ax.scatter(x_norm, y_norm, color="blue", label="data", alpha=0.7)
+    ax.set_xlim(min(x_norm) - 0.1, max(x_norm) + 0.1)
+    ax.set_ylim(min(y_norm) - 0.1, max(y_norm) + 0.1)
+    ax.legend()
+
+    line, = ax.plot([], [], color="red")
+    text = ax.text(0.05, 0.9, "", transform=ax.transAxes)
+
+    def update(i):
+        t0, t1 = snapshots[i]
+        y_pred = [t0 + t1 * xi for xi in x_norm]
+        line.set_data(x_norm, y_pred)
+        text.set_text(f"Iter {i+1}/{len(snapshots)}")
+        return line, text
+
+    ani = FuncAnimation(fig, update, frames=len(snapshots), blit=True, interval=30)
+    ani.save("training.gif", writer="pillow")
+
 
 def main() -> None:
     # Load data
@@ -55,7 +88,7 @@ def main() -> None:
 
     # Train data
     try:
-        theta0, theta1 = train(x_norm, y_norm, learning_rate=0.1, iterations=10_000)
+        theta0, theta1, snapshots = train(x_norm, y_norm, learning_rate=0.1, iterations=10_000)
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(2)
@@ -73,6 +106,8 @@ def main() -> None:
 
     print(f"Theta0 = {theta0_real:.6f}")
     print(f"Theta1 = {theta1_real:.6f}")
+
+    visualize(x_norm, y_norm, snapshots)
     sys.exit(0)
 
 
