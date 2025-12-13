@@ -7,7 +7,7 @@ from src.utils import load_data, load_model, DataLoadError, ModelLoadError
 def plot_results(x: list[float], y: list[float], theta0: float, theta1: float) -> None:
     """Plot actual vs predicted data points."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt # type: ignore
     except ImportError:
         print("Warning: matplotlib not installed. Skipping plot.", file=sys.stderr)
         return

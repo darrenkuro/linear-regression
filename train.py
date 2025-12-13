@@ -48,8 +48,8 @@ def train(
 def visualize(x_norm, y_norm, snapshots) -> None:
     """Animate regression line evolution."""
     try:
-        import matplotlib.pyplot as plt
-        from matplotlib.animation import FuncAnimation, PillowWriter
+        import matplotlib.pyplot as plt # type: ignore
+        from matplotlib.animation import FuncAnimation, PillowWriter # type: ignore
     except ImportError:
         print("Warning: matplotlib not installed. Skipping plot.", file=sys.stderr)
         return
