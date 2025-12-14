@@ -57,7 +57,6 @@ result/
 !.github/PULL_REQUEST_TEMPLATE.md
 
 # Generated
-
 plot.png
 training.gif
 model.json
