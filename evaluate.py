@@ -3,28 +3,7 @@
 import sys
 
 from src.utils import load_data, load_model, DataLoadError, ModelLoadError
-
-def plot_results(x: list[float], y: list[float], theta0: float, theta1: float) -> None:
-    """Plot actual vs predicted data points."""
-    try:
-        import matplotlib.pyplot as plt # type: ignore
-    except ImportError:
-        print("Warning: matplotlib not installed. Skipping plot.", file=sys.stderr)
-        return
-
-    preds = [theta0 + theta1 * xi for xi in x]
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x, y, color="blue", label="Actual data", alpha=0.7)
-    plt.plot(x, preds, color="red", label="Regression line", linewidth=2)
-    plt.title("Model Evaluation")
-    plt.xlabel("Mileage (km)")
-    plt.ylabel("Price")
-    plt.legend()
-    plt.grid(True, linestyle="--", alpha=0.5)
-    plt.tight_layout()
-    plt.savefig("plot.png")
-
+from src.plot import plot_results
 
 def evaluate(x: list[float], y: list[float], theta0: float, theta1: float) -> tuple[float, float]:
     """Compute precision and mean absolute error (MAE) for model predictions."""
@@ -72,7 +51,6 @@ def main() -> None:
 
     plot_results(x, y, theta0, theta1)
     sys.exit(0)
-
 
 if __name__ == "__main__":
     main()
