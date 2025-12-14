@@ -20,6 +20,13 @@ def train(
         raise ValueError("Learning rate must be positive.")
     if not isinstance(epochs, int) or epochs <= 0:
         raise ValueError("Number of epochs must be a positive integer.")
+    if len(set(x)) == 1:
+        raise ValueError("Constant X, slope undefined.")
+    if any(
+        v != v or v == float('inf') or v == float('-inf')
+        for v in x + y
+    ):
+        raise ValueError("Training data contains NaN or infinite values.")
 
     m = len(x)
     theta0, theta1 = 0.0, 0.0

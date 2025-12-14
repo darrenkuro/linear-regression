@@ -11,6 +11,10 @@ def evaluate(x: list[float], y: list[float], theta0: float, theta1: float) -> tu
         raise ValueError("Evaluation data cannot be empty.")
     if len(x) != len(y):
         raise ValueError("Mismatched input lengths for x and y.")
+    if any(v != v or v == float('inf') or v == float('-inf') for v in x + y):
+        raise ValueError("Evaluation data contains NaN or infinite values.")
+    if any(v != v or v == float('inf') or v == float('-inf') for v in [theta0, theta1]):
+        raise ValueError("Model parameters contain NaN or infinite values.")
 
     m = len(x)
     preds = [theta0 + theta1 * xi for xi in x]
