@@ -29,6 +29,7 @@ def visualize(x_norm, y_norm, snapshots) -> None:
     except ImportError:
         print("Warning: matplotlib not installed. Skipping plot.", file=sys.stderr)
         return
+    print(" Generating training animation...", end="")
 
     fig, ax = plt.subplots()
     ax.scatter(x_norm, y_norm, color="blue", label="data", alpha=0.7)
@@ -48,3 +49,4 @@ def visualize(x_norm, y_norm, snapshots) -> None:
 
     ani = FuncAnimation(fig, update, frames=len(snapshots), blit=True, interval=30)
     ani.save("training.gif", writer="pillow")
+    print("  ")

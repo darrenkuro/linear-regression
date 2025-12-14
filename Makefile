@@ -16,42 +16,47 @@ OUT_FILES	:=	plot.png training.gif model.json
 .PHONY: all
 all: train estimate evaluate
 
-$(VENV_DIR):
-	@echo " Creating virtual environment..."
-	$(PYTHON) -m venv $(VENV_DIR)
-
 .PHONY: venv
 venv: $(VENV_DIR)
 
+$(VENV_DIR):
+	@printf " Creating virtual environment..."
+	@$(PYTHON) -m venv $(VENV_DIR)
+	@echo "  "
+
 .PHONY: install
 install: venv
-	@echo " Installing matplotlib..."
-	. $(ACTIVATE) && pip install --upgrade pip setuptools wheel
-	. $(ACTIVATE) && pip install matplotlib
+	@printf " Installing matplotlib..."
+	@. $(ACTIVATE) && pip install --upgrade pip setuptools wheel > /dev/null 2>&1
+	@. $(ACTIVATE) && pip install matplotlib > /dev/null 2>&1
+	@echo "  "
 
 .PHONY: train
 train: install
 	@echo " Training model..."
-	. $(ACTIVATE) && $(PYTHON) $(TRAIN) 10000 0.1
+	@. $(ACTIVATE) && $(PYTHON) $(TRAIN) 10000 0.1
 
 .PHONY: estimate
 estimate: install
-	. $(ACTIVATE) && $(PYTHON) $(ESTIMATE)
+	@echo " Check estimation..."
+	@. $(ACTIVATE) && $(PYTHON) $(ESTIMATE)
 
 .PHONY: evaluate
 evaluate: install
 	@echo " Evaluating model..."
-	. $(ACTIVATE) && $(PYTHON) $(EVAL)
+	@. $(ACTIVATE) && $(PYTHON) $(EVAL)
 
 .PHONY: clean
 clean:
-	@echo "󰃢 Cleaning generated files..."
-	$(RM) $(OUT_FILES)
+	@printf "󰃢 Cleaning generated files..."
+	@$(RM) $(OUT_FILES)
+	@echo "  "
 
 .PHONY: fclean
 fclean: clean
-	@echo " Removing environment and artifacts..."
-	$(RM) -r $(VENV_DIR) __pycache__ 2>/dev/null || true
+	@printf " Removing environment and artifacts..."
+	@$(RM) -r $(VENV_DIR) __pycache__ 2>/dev/null || true
+	@echo "  "
 
 .PHONY: re
 re: fclean all
