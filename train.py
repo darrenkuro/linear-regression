@@ -79,4 +79,4 @@ def main(epochs: int = 10_000, learning_rate: float = 0.1) -> None:
 
 
 if __name__ == "__main__":
-    main(int(sys.argv[1]), float(sys.argv[2])) # --epochs 10000 --lr 0.1
+    main(int(sys.argv[1]), float(sys.argv[2])) # argv 1: epochs, argv 2: lr
