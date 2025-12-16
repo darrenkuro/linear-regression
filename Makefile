@@ -55,7 +55,7 @@ clean:
 .PHONY: fclean
 fclean: clean
 	@printf " Removing environment and artifacts..."
-	@$(RM) -r $(VENV_DIR) __pycache__ 2>/dev/null || true
+	@$(RM) -r $(VENV_DIR) */__pycache__ 2>/dev/null || true
 	@echo "  "
 
 .PHONY: re
